@@ -113,9 +113,8 @@ const escapable=new Set(['\\','`','*','_','[',']','(',')','#','+','-','.','!','>
 function findUnescaped(s,what,from) {for(let j=from;j<=s.length-what.length;j++){if(s[j]==='\\'&&j+1<s.length&&escapable.has(s[j+1])){j++;continue;}if(s.startsWith(what,j))return j;}return -1;}
 function singleStar(s,from) {for(let j=from;j<s.length;j++){if(s[j]==='\\'&&j+1<s.length&&escapable.has(s[j+1])){j++;continue;}if(s[j]==='*'){if(s[j+1]==='*'){j++;continue;}return j;}}return -1;}
 function inline(s,link) {
-  const out=[];let i=0,start=0;
-  while(i<s.length) {const c=s[i];
-    if(c!=='\\'&&c!=='`'&&c!=='*'&&c!=='['){i++;continue;}
+  const out=[], special=/[\\`*[]/g;let i=0,start=0;
+  while(i<s.length) {special.lastIndex=i;const match=special.exec(s);if(!match)break;i=match.index;const c=s[i];
     if(i>start)out.push(escape(s.slice(start,i)));
     if(c==='\\'&&i+1<s.length&&escapable.has(s[i+1])){out.push(escape(s[i+1]));i+=2;}
     else if(c==='`'){const j=s.indexOf('`',i+1);if(j>i+1){out.push('<code>',escape(s.slice(i+1,j)),'</code>');i=j+1;}else{out.push('`');i++;}}
